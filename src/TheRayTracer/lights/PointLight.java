@@ -3,14 +3,22 @@ package TheRayTracer.lights;
 import TheRayTracer.Intersection;
 import TheRayTracer.Ray;
 import TheRayTracer.Vector3D;
+import TheRayTracer.objects.Object3D;
 
 import java.awt.*;
+import java.util.List;
 
 public class PointLight extends Light{
     public PointLight(Vector3D position, Color color, double intensity) {
         super(position, color, intensity);
 
     }
+
+    @Override
+    public boolean isInShadow(Vector3D point, Vector3D normal, List<Object3D> objects) {
+        return false;
+    }
+
 
     @Override
     public double getNDotL(Intersection intersection) {
