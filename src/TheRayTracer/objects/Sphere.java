@@ -23,21 +23,29 @@ public class Sphere extends Object3D{
 
     @Override
     public Intersection getIntersection(Ray ray) {
-        Vector3D L = Vector3D.substract(getPosition(),ray.getOrigin());
-        double tca = Vector3D.dotProduct(L, ray.getDirection());
-        double L2 = Math.pow(Vector3D.magnitude(L), 2);
-        double d2 = L2 - Math.pow(tca, 2);
-        if(d2 >= 0){
-            double d = Math.sqrt(d2);
-            double t0 = tca - Math.sqrt(Math.pow(getRadius(), 2) - Math.pow(d, 2));
-            double t1 = tca + Math.sqrt(Math.pow(getRadius(), 2) - Math.pow(d, 2));
+        Vector3D L = Vector3D.substract(getPosition(), ray.getOrigin());
+        double tca = Vector3D.dotProduct(ray.getDirection(), L);
+        double d2 = Vector3D.dotProduct(L, L) - tca * tca;
 
-            double distance = Math.min(t0, t1);
-            Vector3D position = Vector3D.add(ray.getOrigin(), Vector3D.scalarMultiplication(ray.getDirection(), distance));
-            Vector3D normal = Vector3D.normalize(Vector3D.substract(position, getPosition()));
-            return new Intersection(position, distance, normal, this);
+        double radius2 = getRadius() * getRadius();
+        if (d2 > radius2) return null;
+
+        double thc = Math.sqrt(radius2 - d2);
+        double t0 = tca - thc;
+        double t1 = tca + thc;
+
+        double distance = -1;
+        if (t0 > .0001) {
+            distance = t0;
+        } else if (t1 > .0001) {
+            distance = t1;
+        } else {
+            return null;
         }
 
-        return null;
+        Vector3D position = Vector3D.add(ray.getOrigin(), Vector3D.scalarMultiplication(ray.getDirection(), distance));
+        Vector3D normal = Vector3D.normalize(Vector3D.substract(position, getPosition()));
+        return new Intersection(position, distance, normal, this);
     }
+
 }

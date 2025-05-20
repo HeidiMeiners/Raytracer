@@ -21,20 +21,20 @@ public class Raytracer {
         Scene scene01 = new Scene();
         TransformObject transform = new TransformObject();
 
-        scene01.setCamera(new Camera(new Vector3D(0, 0, -4), 60, 60,
-                800, 800, 0.6, 50.0));
+        scene01.setCamera(new Camera(new Vector3D(0, 0, -4), 60, 55,
+                1920, 1080, 0.6, 50.0));
 
-        scene01.addLight(new PointLight(new Vector3D(0,5,2), Color.WHITE, 3));
-        scene01.addLight(new PointLight(new Vector3D(5,3,0), Color.WHITE, 3));
-        scene01.addLight(new PointLight(new Vector3D(-5,3,0), Color.WHITE, 3));
-        //scene01.addLight(new DirectionalLight(new Vector3D(0,0.5,1), Color.white,.5));
+        //scene01.addLight(new PointLight(new Vector3D(1, 0, 0), Color.WHITE, 3));
+        scene01.addLight(new PointLight(new Vector3D(0, 5, -3), Color.WHITE, 3));
+        scene01.addLight(new PointLight(new Vector3D(0, 0, -3), Color.WHITE, 3));
+        //scene01.addLight(new DirectionalLight(new Vector3D(0,0,1), Color.white,.5));
 
-        scene01.addObject(new Model3D(new Vector3D(0, -2, 0), new Triangle[] {
-                new Triangle(new Vector3D(-5, 0, -5), new Vector3D( 5, 0, -5), new Vector3D( 5, 0,  5)),
-                new Triangle(new Vector3D(-5, 0, -5), new Vector3D( 5, 0,  5), new Vector3D(-5, 0,  5))},
-                    Color.LIGHT_GRAY));
-        //scene01.addObject(new Sphere(new Vector3D(0.5, 5, 8), 0.8, Color.yellow));
-        scene01.addObject(OBJReader.getModel3D("C:\\ISGC\\4_Semestre_ISGC\\Graficas_computacionales\\3Parcial\\Raytracer\\SmallTeapot.obj",new Vector3D(0,-2,2), Color.red,2,0));
+        scene01.addObject(new Model3D(new Vector3D(0, -2, 0), new Triangle[]{
+                new Triangle(new Vector3D(-5, 0, -5), new Vector3D(5, 0, -5), new Vector3D(5, 0, 5)),
+                new Triangle(new Vector3D(-5, 0, -5), new Vector3D(5, 0, 5), new Vector3D(-5, 0, 5))},
+                Color.LIGHT_GRAY));
+        scene01.addObject(new Sphere(new Vector3D(0, 0, -1), 1, Color.BLUE));
+        //scene01.addObject(OBJReader.getModel3D("C:\\ISGC\\4_Semestre_ISGC\\Graficas_computacionales\\3Parcial\\Objects\\SmallTeapot.obj", new Vector3D(0, -2, 2), Color.red, 2, 0));
         //scene01.addObject(OBJReader.getModel3D("C:\\ISGC\\4_Semestre_ISGC\\Graficas_computacionales\\3Parcial\\FirstScene\\Coffe_table.obj",new Vector3D(0, -3, 2),new Color(88,57,39)));
         //scene01.addObject(OBJReader.getModel3D("C:\\ISGC\\4_Semestre_ISGC\\Graficas_computacionales\\3Parcial\\FirstScene\\glass.obj",new Vector3D(3,-3,2),Color.blue));
         //scene01.addObject(OBJReader.getModel3D("C:\\ISGC\\4_Semestre_ISGC\\Graficas_computacionales\\3Parcial\\FirstScene\\CanOBJ.obj",new Vector3D(-3,-3,2),Color.gray));
@@ -75,24 +75,25 @@ public class Raytracer {
                 if (closestIntersection != null) {
                     Color objColor = closestIntersection.getObject().getColor();
 
-                    for(Light light : lights) {
+                    for (Light light : lights) {
+                        if (light.isInShadow(closestIntersection.getPosition(), closestIntersection.getNormal(), objects)) {
+                            continue;
+                        }
+
                         double nDotL = light.getNDotL(closestIntersection);
                         Color lightColor = light.getColor();
                         double intensity;
 
-                        Vector3D toLight = Vector3D.normalize(Vector3D.substract(light.getPosition(), closestIntersection.getPosition()));
-                        Ray shadowRay =new Ray(closestIntersection.getPosition(), toLight);
-
-                        if (light instanceof PointLight){
-                            intensity = (light.getIntensity()/closestIntersection.getDistance())* nDotL;
-                        }
-                        else{
-                             intensity = light.getIntensity()* nDotL;
+                        if (light instanceof PointLight) {
+                            double lightDistance = Vector3D.magnitude(Vector3D.substract(light.getPosition(), closestIntersection.getPosition()));
+                            intensity = (light.getIntensity() / lightDistance) * nDotL;
+                        } else {
+                            intensity = light.getIntensity() * nDotL;
                         }
 
                         double[] lightColors = new double[]{lightColor.getRed() / 255.0, lightColor.getGreen() / 255.0, lightColor.getBlue() / 255.0};
-                        double[] objColors = new double[]{objColor.getRed() / 255.0 , objColor.getGreen() / 255.0 , objColor.getBlue() / 255.0};
-                        for(int colorIndex = 0; colorIndex < lightColors.length; colorIndex++) {
+                        double[] objColors = new double[]{objColor.getRed() / 255.0, objColor.getGreen() / 255.0, objColor.getBlue() / 255.0};
+                        for (int colorIndex = 0; colorIndex < lightColors.length; colorIndex++) {
                             objColors[colorIndex] *= intensity * lightColors[colorIndex];
                         }
 
@@ -133,7 +134,7 @@ public class Raytracer {
         return closestIntersection;
     }
 
-    public static Color addColor(Color original, Color otherColor){
+    public static Color addColor(Color original, Color otherColor) {
         float red = (float) Math.clamp((original.getRed() / 255.0) + (otherColor.getRed() / 255.0), 0.0, 1.0);
         float green = (float) Math.clamp((original.getGreen() / 255.0) + (otherColor.getGreen() / 255.0), 0.0, 1.0);
         float blue = (float) Math.clamp((original.getBlue() / 255.0) + (otherColor.getBlue() / 255.0), 0.0, 1.0);

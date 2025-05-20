@@ -97,32 +97,30 @@ public class Camera extends Object3D {
 
 
     public Vector3D[][] calculatePositionsToRay() {
-        double aspectRatio = (double) getResolutionWidth() / getResolutionHeight();
+        int width = getResolutionWidth();
+        int height = getResolutionHeight();
+        double aspectRatio = (double) width / height;
 
-        double angleMaxX = getFOVHorizontal() / 2.0;
-        double radiusMaxX = getDefaultZ() / Math.cos(Math.toRadians(angleMaxX));
+        double fovRadians = Math.toRadians(getFOVVertical());
+        double imagePlaneHeight = 2 * Math.tan(fovRadians / 2) * defaultZ;
+        double imagePlaneWidth = imagePlaneHeight * aspectRatio;
 
-        double angleMaxY = getFOVVertical() / 2.0;
-        double radiusMaxY = getDefaultZ() / Math.sin(Math.toRadians(angleMaxY));
+        double pixelWidth = imagePlaneWidth / width;
+        double pixelHeight = imagePlaneHeight / height;
 
-        double maxY = Math.sin(Math.toRadians(angleMaxY)) * radiusMaxY;
-        double minY = -maxY;
+        double minX = -imagePlaneWidth / 2.0;
+        double maxY = imagePlaneHeight / 2.0;
 
-        double maxX = maxY * aspectRatio;
-        double minX = -maxX;
+        Vector3D[][] positions = new Vector3D[width][height];
 
-        Vector3D[][] positions = new Vector3D[getResolutionWidth()][getResolutionHeight()];
-        double posZ = defaultZ;
-
-        double stepX = (maxX - minX) / getResolutionWidth();
-        double stepY = (maxY - minY) / getResolutionHeight();
-        for (int x = 0; x < positions.length; x++) {
-            for (int y = 0; y < positions[x].length; y++) {
-                double posX = minX + (stepX * x);
-                double posY = maxY - (stepY * y);
-                positions[x][y] = new Vector3D(posX, posY, posZ);
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                double posX = minX + pixelWidth * (x + 0.5);
+                double posY = maxY - pixelHeight * (y + 0.5);
+                positions[x][y] = new Vector3D(posX, posY, defaultZ);
             }
         }
+
         return positions;
     }
 
