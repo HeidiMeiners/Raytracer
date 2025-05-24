@@ -8,8 +8,8 @@ import java.awt.*;
 
 public class Sphere extends Object3D{
     private double radius;
-    public Sphere(Vector3D position, double radius, Color color) {
-        super(position, color);
+    public Sphere(Vector3D position, double radius, Color color,double shininess,double specularCoefficient) {
+        super(position, color, shininess, specularCoefficient);
         setRadius(radius);
     }
 

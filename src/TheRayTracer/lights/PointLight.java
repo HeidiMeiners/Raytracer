@@ -7,8 +7,11 @@ import TheRayTracer.objects.Object3D;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Random;
 
 public class PointLight extends Light{
+    private static final Random random = new Random();
+
     public PointLight(Vector3D position, Color color, double intensity) {
         super(position, color, intensity);
     }
@@ -29,7 +32,6 @@ public class PointLight extends Light{
         }
         return false;
     }
-
 
     @Override
     public double getNDotL(Intersection intersection) {

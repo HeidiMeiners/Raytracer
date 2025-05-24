@@ -22,7 +22,7 @@ public class Raytracer {
         TransformObject transform = new TransformObject();
 
         scene01.setCamera(new Camera(new Vector3D(0, 0, -4), 60, 60,
-                4096, 2160, 0.6, 50.0));
+                500, 500, 0.6, 50.0));
 
         scene01.addLight(new PointLight(new Vector3D(0, 5, 2), Color.WHITE, 3));
         scene01.addLight(new PointLight(new Vector3D(2, 1, -3), Color.WHITE, 3));
@@ -32,9 +32,9 @@ public class Raytracer {
         scene01.addObject(new Model3D(new Vector3D(0, -2, 0), new Triangle[]{
                 new Triangle(new Vector3D(-5, 0, -5), new Vector3D(5, 0, -5), new Vector3D(5, 0, 5)),
                 new Triangle(new Vector3D(-5, 0, -5), new Vector3D(5, 0, 5), new Vector3D(-5, 0, 5))},
-                Color.LIGHT_GRAY));
-        //scene01.addObject(new Sphere(new Vector3D(0, 0, -1), 1, Color.BLUE));
-        scene01.addObject(OBJReader.getModel3D("C:\\ISGC\\4_Semestre_ISGC\\Graficas_computacionales\\3Parcial\\Objects\\SmallTeapot.obj", new Vector3D(0, -2, 2), Color.red, 1.5, 0));
+                Color.LIGHT_GRAY,10,.1));
+        scene01.addObject(new Sphere(new Vector3D(3, 3, 5), 1, Color.BLUE,80,1));
+        scene01.addObject(OBJReader.getModel3D("C:\\ISGC\\4_Semestre_ISGC\\Graficas_computacionales\\3Parcial\\Objects\\SmallTeapot.obj", new Vector3D(0, -2, 2), Color.red, 1.5, 0,50,0.5));
         //scene01.addObject(OBJReader.getModel3D("C:\\ISGC\\4_Semestre_ISGC\\Graficas_computacionales\\3Parcial\\FirstScene\\Coffe_table.obj",new Vector3D(0, -3, 2),new Color(88,57,39)));
         //scene01.addObject(OBJReader.getModel3D("C:\\ISGC\\4_Semestre_ISGC\\Graficas_computacionales\\3Parcial\\FirstScene\\glass.obj",new Vector3D(0,-2,2),Color.blue,1,0));
         //scene01.addObject(OBJReader.getModel3D("C:\\ISGC\\4_Semestre_ISGC\\Graficas_computacionales\\3Parcial\\FirstScene\\CanOBJ.obj",new Vector3D(-3,-3,2),Color.gray));
@@ -60,6 +60,9 @@ public class Raytracer {
         Vector3D[][] posRaytrace = mainCamera.calculatePositionsToRay();
         Vector3D pos = mainCamera.getPosition();
         double cameraZ = pos.getZ();
+        ReflectionRefraction reflecRefrac = new ReflectionRefraction();
+        int shadowSamples = 16;    // puedes ajustar
+        double shadowRadius = 0.5;
 
         for (int i = 0; i < posRaytrace.length; i++) {
             for (int j = 0; j < posRaytrace[i].length; j++) {
@@ -109,8 +112,8 @@ public class Raytracer {
                         Vector3D viewDir = Vector3D.normalize(Vector3D.substract(scene.getCamera().getPosition(), closestIntersection.getPosition()));
                         Vector3D lightDir = Vector3D.normalize(Vector3D.substract(light.getPosition(), closestIntersection.getPosition()));
                         Vector3D reflectDir = Vector3D.substract(Vector3D.scalarMultiplication(lightDir,-1), Vector3D.scalarMultiplication(closestIntersection.getNormal(),2 * Vector3D.dotProduct(closestIntersection.getNormal(), Vector3D.scalarMultiplication(lightDir,-1))));
-                        double spec = Math.pow(Math.max(0.0, Vector3D.dotProduct(viewDir, reflectDir)), 100); // shininess = 32
-                        double ks = 1; // coeficiente especular
+                        double spec = Math.pow(Math.max(0.0, Vector3D.dotProduct(viewDir, reflectDir)), closestIntersection.getObject().getShininess()); // shininess = 100
+                        double ks = closestIntersection.getObject().getSpecularCoefficient(); // coeficiente especular
 
                         Color specular = new Color(
                                 (float)Math.clamp(ks * lightColors[0] * spec, 0.0, 1.0),
@@ -118,9 +121,20 @@ public class Raytracer {
                                 (float)Math.clamp(ks * lightColors[2] * spec, 0.0, 1.0)
                         );
 
-
                         pixelColor = addColor(pixelColor, diffuse);
                         pixelColor = addColor(pixelColor, specular);
+                    }
+                    if (closestIntersection.getObject().getShininess()!=0 || closestIntersection.getObject().getSpecularCoefficient()!=0) {
+                        Intersection reflectedObject =raycast(reflecRefrac.reflectionRay(closestIntersection,new Vector3D(x,y,z)), objects, null,
+                                new double[]{cameraZ + nearFarPlanes[0], cameraZ + nearFarPlanes[1]});
+                        if (reflectedObject!=null){
+                            Color reflectedColor=reflectedObject.getObject().getColor();
+                            int finalColorRed=(int)(((1-closestIntersection.getObject().getSpecularCoefficient())*pixelColor.getRed())+(closestIntersection.getObject().getSpecularCoefficient()*reflectedColor.getRed()));
+                            int finalColorGreen=(int)(((1-closestIntersection.getObject().getSpecularCoefficient())*pixelColor.getGreen())+(closestIntersection.getObject().getSpecularCoefficient()*reflectedColor.getGreen()));
+                            int finalColorBlue=(int)(((1-closestIntersection.getObject().getSpecularCoefficient())*pixelColor.getBlue())+(closestIntersection.getObject().getSpecularCoefficient()*reflectedColor.getBlue()));
+                            pixelColor = new Color(Math.min(255, Math.max(0, finalColorRed)),Math.min(255, Math.max(0, finalColorGreen)),Math.min(255, Math.max(0, finalColorBlue)));
+
+                        }
                     }
                 }
                 image.setRGB(i, j, pixelColor.getRGB());

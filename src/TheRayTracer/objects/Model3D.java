@@ -14,8 +14,8 @@ import java.util.Set;
 public class Model3D extends Object3D{
     private List<Triangle> triangles;
 
-    public Model3D(Vector3D position, Triangle[] triangles, Color color) {
-        super(position, color);
+    public Model3D(Vector3D position, Triangle[] triangles, Color color, double shininess, double spectacularCoefficient) {
+        super(position, color, shininess, spectacularCoefficient);
         setTriangles(triangles);
     }
 
