@@ -19,7 +19,6 @@ public class Raytracer {
         System.out.println(new Date());
         Scene scene01 = new Scene();
         Scene scene02 = new Scene();
-        TransformObject transform = new TransformObject();
 
         scene01.setCamera(new Camera(new Vector3D(0, 0, -4), 60, 55, 300, 300, .6, 50));
         scene02.setCamera(new Camera(new Vector3D(0, 0, -4), 60, 55, 500, 300, .6, 50));
