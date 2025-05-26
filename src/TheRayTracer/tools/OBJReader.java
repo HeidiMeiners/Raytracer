@@ -14,7 +14,7 @@ import java.util.List;
 
 public abstract class OBJReader {
 
-    public static Model3D getModel3D(String path, Vector3D origin, Color color,double scale,double angle, double shininess, double specularCoefficient) {
+    public static Model3D getModel3D(String path, Vector3D origin, Color color,double scale,double angle, double shininess, double specularCoefficient, double refractionCoefficient, double transparency) {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(path));
 
@@ -85,7 +85,7 @@ public abstract class OBJReader {
             }
             reader.close();
             rotateObjectY(triangles.toArray(new Triangle[triangles.size()]),angle);
-            return new Model3D(origin, triangles.toArray(new Triangle[triangles.size()]), color, shininess, specularCoefficient);
+            return new Model3D(origin, triangles.toArray(new Triangle[triangles.size()]), color, shininess, specularCoefficient, refractionCoefficient, transparency);
         } catch (IOException e) {
             System.err.println(e.toString());
         }

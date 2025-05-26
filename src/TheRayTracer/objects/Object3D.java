@@ -9,13 +9,33 @@ public abstract class Object3D implements IIntersectable{
     private Vector3D position;
     private double shininess;
     private double specularCoefficient;
+    private double refractionCoefficient;
+    private double transparency;
 
 
-    public Object3D(Vector3D position, Color color, double shininess, double specularCoefficient) {
+    public Object3D(Vector3D position, Color color, double shininess, double specularCoefficient, double refractionCoefficient, double transparency) {
         setPosition(position);
         setColor(color);
         setShininess(shininess);
         setSpecularCoefficient(specularCoefficient);
+        setRefractionCoefficient(refractionCoefficient);
+        setTransparency(transparency);
+    }
+
+    public double getTransparency() {
+        return transparency;
+    }
+
+    public void setTransparency(double transparency) {
+        this.transparency = transparency;
+    }
+
+    public double getRefractionCoefficient() {
+        return refractionCoefficient;
+    }
+
+    public void setRefractionCoefficient(double reflectionCoefficient) {
+        this.refractionCoefficient = reflectionCoefficient;
     }
 
     public double getShininess() {

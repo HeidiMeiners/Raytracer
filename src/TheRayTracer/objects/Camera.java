@@ -15,7 +15,7 @@ public class Camera extends Object3D {
 
     public Camera(Vector3D position, double fovH, double fovV,
                   int width, int height, double nearPlane, double farPlane) {
-        super(position, Color.BLACK,0,0);
+        super(position, Color.BLACK,0,0,0,0);
         setFOV(fovH, fovV);
         setResolution(width, height);
         setNearFarPlanes(new double[]{nearPlane, farPlane});
