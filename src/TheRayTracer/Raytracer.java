@@ -1,9 +1,11 @@
 package TheRayTracer;
 
+import TheRayTracer.BVH.BVHNode;
 import TheRayTracer.lights.Light;
 import TheRayTracer.lights.PointLight;
 import TheRayTracer.objects.*;
 import TheRayTracer.tools.OBJReader;
+import TheRayTracer.tools.ReflectionRefraction;
 
 import javax.imageio.ImageIO;
 import java.awt.Color;
@@ -17,32 +19,37 @@ import java.util.stream.IntStream;
 public class Raytracer {
     public static void main(String[] args) {
         System.out.println(new Date());
-        Scene scene01 = new Scene();
-        Scene scene02 = new Scene();
+        //Scene scene01 = new Scene();
+        //Scene scene02 = new Scene();
+        Scene scene03 = new Scene();
 
-        scene01.setCamera(new Camera(new Vector3D(0, 0, -4), 60, 55, 300, 300, .6, 50));
-        scene02.setCamera(new Camera(new Vector3D(0, 0, -4), 60, 55, 500, 300, .6, 50));
+        //scene01.setCamera(new Camera(new Vector3D(0, 0, -4), 60, 60, 4096, 2160, 0.6, 50.0));
+        //scene02.setCamera(new Camera(new Vector3D(0, 0, -4), 60, 60, 4096, 2160, 0.6, 50.0));
+        scene03.setCamera(new Camera(new Vector3D(0, 0, -4), 60, 60, 409, 216, 0.6, 50.0));
 
-        scene01.addLight(new PointLight(new Vector3D(0, 3, 4), Color.WHITE, 3));
+        /*scene01.addLight(new PointLight(new Vector3D(0, 3, 4), Color.WHITE, 3));
         scene01.addLight(new PointLight(new Vector3D(2, 1, -3), Color.WHITE, 3));
         scene01.addLight(new PointLight(new Vector3D(-2, 1, -3), Color.WHITE, 3));
 
         scene02.addLight(new PointLight(new Vector3D(0, 3, -3), Color.WHITE, 3));
         scene02.addLight(new PointLight(new Vector3D(0, 3, 2), Color.orange, 3));
+*/
+        scene03.addLight(new PointLight(new Vector3D(0, 3, -3), Color.WHITE, 3));
+        scene03.addLight(new PointLight(new Vector3D(0, 3, 2), Color.white, 3));
 
-        scene01.addObject(new Model3D(new Vector3D(0, -2, 0), new Triangle[]{
-                new Triangle(new Vector3D(-20, 0, -20), new Vector3D(20, 0, -20), new Vector3D(20, 0, 20)),
-                new Triangle(new Vector3D(-20, 0, -20), new Vector3D(20, 0, 20), new Vector3D(-12, 0, 20))},
+       /* scene01.addObject(new Model3D(new Vector3D(0, -2, 0), new Triangle[]{
+                new Triangle(new Vector3D(-25, 0, -25), new Vector3D(25, 0, -25), new Vector3D(25, 0, 25)),
+                new Triangle(new Vector3D(-25, 0, -25), new Vector3D(25, 0, 25), new Vector3D(-25, 0, 25))},
                 Color.LIGHT_GRAY,10,.1,0,0));
         scene01.addObject(new Model3D(new Vector3D(0, 0, 10), new Triangle[]{
-                new Triangle(new Vector3D(-20, -20, 0), new Vector3D(20, -20, 0), new Vector3D(20,20, 0)),
-                new Triangle(new Vector3D(-20, -20, 0), new Vector3D(20, 20, 0), new Vector3D(-20, 20, 0))},
+                new Triangle(new Vector3D(-25, -25, 0), new Vector3D(25, -25, 0), new Vector3D(25,25, 0)),
+                new Triangle(new Vector3D(-25, -25, 0), new Vector3D(25, 25, 0), new Vector3D(-25, 25, 0))},
                 Color.lightGray,100,1,0,0));
         scene01.addObject(new Sphere(new Vector3D( 1.0, -1.5,  0), .5, Color.white,100,1,1.5,.9));
         scene01.addObject(OBJReader.getModel3D("C:\\ISGC\\4_Semestre_ISGC\\Graficas_computacionales\\3Parcial\\Raytracer\\src\\TheRayTracer\\Scene01Objects\\glass.obj",new Vector3D(0.0, -2,  2),Color.blue,1,0,10,.1,1.5,.9));
         scene01.addObject(OBJReader.getModel3D("C:\\ISGC\\4_Semestre_ISGC\\Graficas_computacionales\\3Parcial\\Raytracer\\src\\TheRayTracer\\Scene01Objects\\CanOBJ.obj",new Vector3D(2.5, -2,  2),Color.darkGray,1,0,80,.8,0,0));
         scene01.addObject(OBJReader.getModel3D("C:\\ISGC\\4_Semestre_ISGC\\Graficas_computacionales\\3Parcial\\Raytracer\\src\\TheRayTracer\\Scene01Objects\\Cup.obj",new Vector3D(-2.5, -2,  2.5),new Color(210,200,180),.5,0,1,0,0,0));
-        scene01.addObject(OBJReader.getModel3D("C:\\ISGC\\4_Semestre_ISGC\\Graficas_computacionales\\3Parcial\\Raytracer\\src\\TheRayTracer\\Scene01Objects\\Wrench_OBJ.obj",new Vector3D(-1, -1.9,  0),Color.gray,1,30,80,.8,0,0));
+        scene01.addObject(OBJReader.getModel3D("C:\\ISGC\\4_Semestre_ISGC\\Graficas_computacionales\\3Parcial\\Raytracer\\src\\TheRayTracer\\Scene01Objects\\Wrench_OBJ.obj",new Vector3D(-1, -1.9,  0),Color.gray,.8,30,80,.8,0,0));
 
         scene02.addObject(new Model3D(new Vector3D(0, -2, 0), new Triangle[]{
                 new Triangle(new Vector3D(-20, 0, -20), new Vector3D(20, 0, -20), new Vector3D(20, 0, 20)),
@@ -51,11 +58,24 @@ public class Raytracer {
         scene02.addObject(OBJReader.getModel3D("C:\\ISGC\\4_Semestre_ISGC\\Graficas_computacionales\\3Parcial\\Raytracer\\src\\TheRayTracer\\Scene02Objects\\OBJ.obj",new Vector3D(-1, -1.9,  3),new Color(255, 215, 0),.3,90,80,.8,0,0));
         scene02.addObject(OBJReader.getModel3D("C:\\ISGC\\4_Semestre_ISGC\\Graficas_computacionales\\3Parcial\\Raytracer\\src\\TheRayTracer\\Scene02Objects\\Cube.obj",new Vector3D(1, -1.9,  0),Color.white,1,0,10,.1,1.5,.9));
         scene02.addObject(OBJReader.getModel3D("C:\\ISGC\\4_Semestre_ISGC\\Graficas_computacionales\\3Parcial\\Raytracer\\src\\TheRayTracer\\Scene02Objects\\Cube.obj",new Vector3D(-1, 1,  0),Color.white,1,0,10,.1,1.5,.9));
+*/
+        scene03.addObject(new Model3D(new Vector3D(0, -2, 0), new Triangle[]{
+                new Triangle(new Vector3D(-20, 0, -20), new Vector3D(20, 0, -20), new Vector3D(20, 0, 20)),
+                new Triangle(new Vector3D(-20, 0, -20), new Vector3D(20, 0, 20), new Vector3D(-12, 0, 20))},
+                Color.LIGHT_GRAY,10,.1,0,0));
+        scene03.addObject(new Model3D(new Vector3D(0, 0, 10), new Triangle[]{
+                new Triangle(new Vector3D(-25, -25, 0), new Vector3D(25, -25, 0), new Vector3D(25,25, 0)),
+                new Triangle(new Vector3D(-25, -25, 0), new Vector3D(25, 25, 0), new Vector3D(-25, 25, 0))},
+                Color.blue,10,.1,0,0));
+        scene03.addObject(OBJReader.getModel3D("C:\\ISGC\\4_Semestre_ISGC\\Graficas_computacionales\\3Parcial\\Raytracer\\src\\TheRayTracer\\Scene03Objects\\Trumpet.obj",new Vector3D(0, -1.9,  3),new Color(255, 215, 0),6,0,80,.8,0,0));
+        scene03.addObject(OBJReader.getModel3D("C:\\ISGC\\4_Semestre_ISGC\\Graficas_computacionales\\3Parcial\\Raytracer\\src\\TheRayTracer\\Scene03Objects\\Mic_OBJ.obj",new Vector3D(-5, -1.9,  3),Color.black,.1,0,10,.1,1.5,.9));
+        scene03.addObject(OBJReader.getModel3D("C:\\ISGC\\4_Semestre_ISGC\\Graficas_computacionales\\3Parcial\\Raytracer\\src\\TheRayTracer\\Scene03Objects\\scene.obj",new Vector3D(5, 0,  3),new Color(210,200,180),.2,180,50,.5,0,0));
 
 
 
+        scene03.buildBVH();
 
-        BufferedImage image = raytrace(scene02);
+        BufferedImage image = raytrace(scene03);
         File outputImage = new File("image.png");
         try {
             ImageIO.write(image, "png", outputImage);
@@ -73,7 +93,7 @@ public class Raytracer {
                 mainCamera.getResolutionHeight(),
                 BufferedImage.TYPE_INT_RGB
         );
-        List<Object3D> objects = scene.getObjects();
+        Object3D rootBVH = scene.getBVHRoot();
         List<Light> lights = scene.getLights();
         Vector3D[][] posRaytrace = mainCamera.calculatePositionsToRay();
         Vector3D pos = mainCamera.getPosition();
@@ -95,22 +115,22 @@ public class Raytracer {
                     double z = posRaytrace[i][j].getZ() + pos.getZ();
 
                     Ray ray = new Ray(mainCamera.getPosition(), new Vector3D(x, y, z));
-                    Intersection closestIntersection = raycast(ray, objects, null, new double[]{cameraZ + nearFarPlanes[0], cameraZ + nearFarPlanes[1]});
-
+                    Intersection closestIntersection = rootBVH.getIntersection(ray);
                     Color pixelColor = Color.black;
+
                     if (closestIntersection != null) {
                         Color reflected = Color.BLACK;
                         Color refracted = Color.BLACK;
                         Color objColor = closestIntersection.getObject().getColor();
-                        Color ogColor = objectColor(closestIntersection, pixelColor, objects, lights, mainCamera);
+                        Color ogColor = objectColor(closestIntersection, pixelColor, rootBVH, lights, mainCamera);
 
                         // reflexión
                         if (closestIntersection.getObject().getShininess() != 0 || closestIntersection.getObject().getSpecularCoefficient() != 0) {
-                            reflected = reflecRefrac.reflectionColor(closestIntersection, ray.getDirection(), 3, objects, mainCamera, objColor, lights);
+                            reflected = reflecRefrac.reflectionColor(closestIntersection, ray.getDirection(), 3, rootBVH, mainCamera, objColor, lights);
                         }
                         // refraction
                         if (closestIntersection.getObject().getTransparency() != 0 || closestIntersection.getObject().getRefractionCoefficient() != 0) {
-                            refracted = reflecRefrac.refraction(closestIntersection, ray.getDirection(), objects, mainCamera, objColor, 3, lights);
+                            refracted = reflecRefrac.refraction(closestIntersection, ray.getDirection(), rootBVH, mainCamera, objColor, 3, lights);
                         }
 
                         // mezcla final
@@ -136,29 +156,6 @@ public class Raytracer {
     }
 
 
-    public static Intersection raycast(Ray ray, List<Object3D> objects, Object3D caster, double[] clippingPlanes) {
-        Intersection closestIntersection = null;
-
-        for (int i = 0; i < objects.size(); i++) {
-            Object3D currObj = objects.get(i);
-            if (caster == null || !currObj.equals(caster)) {
-                Intersection intersection = currObj.getIntersection(ray);
-                if (intersection != null) {
-                    double distance = intersection.getDistance();
-                    double intersectionZ = intersection.getPosition().getZ();
-
-                    if (distance >= 0 &&
-                            (closestIntersection == null || distance < closestIntersection.getDistance()) &&
-                            (clippingPlanes == null || (intersectionZ >= clippingPlanes[0] && intersectionZ <= clippingPlanes[1]))) {
-                        closestIntersection = intersection;
-                    }
-                }
-            }
-        }
-
-        return closestIntersection;
-    }
-
     public static Color addColor(Color original, Color otherColor) {
         float red = (float) Math.clamp((original.getRed() / 255.0) + (otherColor.getRed() / 255.0), 0.0, 1.0);
         float green = (float) Math.clamp((original.getGreen() / 255.0) + (otherColor.getGreen() / 255.0), 0.0, 1.0);
@@ -166,7 +163,7 @@ public class Raytracer {
         return new Color(red, green, blue);
     }
 
-    public static Color objectColor(Intersection closestIntersection, Color pixelColor, List<Object3D> objects, List<Light> lights, Camera camera) {
+    public static Color objectColor(Intersection closestIntersection, Color pixelColor, Object3D bvhRoot, List<Light> lights, Camera camera) {
         Color objColor = closestIntersection.getObject().getColor();
         //ambient light
         int redAmbient= (int)(objColor.getRed()*.1);
@@ -175,7 +172,7 @@ public class Raytracer {
         Color ambient=new Color(redAmbient,greenAmbient,blueAmbient);
         pixelColor = addColor(pixelColor, ambient);
         for (Light light : lights) {
-            if (light.isInShadow(closestIntersection.getPosition(), closestIntersection.getNormal(), objects)) {
+            if (light.isInShadow(closestIntersection.getPosition(), closestIntersection.getNormal(), bvhRoot)) {
                 continue;
             }
 

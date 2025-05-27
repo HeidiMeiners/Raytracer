@@ -1,5 +1,6 @@
 package TheRayTracer.objects;
 
+import TheRayTracer.BVH.BoundingBox;
 import TheRayTracer.Vector3D;
 
 import java.awt.*;
@@ -69,4 +70,7 @@ public abstract class Object3D implements IIntersectable{
     public void setPosition(Vector3D position) {
         this.position = position;
     }
+
+    public abstract BoundingBox getBoundingBox();
+
 }

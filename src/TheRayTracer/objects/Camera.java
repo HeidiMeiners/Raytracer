@@ -1,5 +1,6 @@
 package TheRayTracer.objects;
 
+import TheRayTracer.BVH.BoundingBox;
 import TheRayTracer.Vector3D;
 import TheRayTracer.Intersection;
 import TheRayTracer.Ray;
@@ -127,5 +128,10 @@ public class Camera extends Object3D {
     @Override
     public Intersection getIntersection(Ray ray) {
         return new Intersection(Vector3D.ZERO(), -1, Vector3D.ZERO(), null);
+    }
+
+    @Override
+    public BoundingBox getBoundingBox() {
+        return null;
     }
 }

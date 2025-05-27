@@ -1,5 +1,6 @@
 package TheRayTracer.objects;
 
+import TheRayTracer.BVH.BoundingBox;
 import TheRayTracer.Intersection;
 import TheRayTracer.Ray;
 import TheRayTracer.Vector3D;
@@ -46,6 +47,21 @@ public class Sphere extends Object3D{
         Vector3D position = Vector3D.add(ray.getOrigin(), Vector3D.scalarMultiplication(ray.getDirection(), distance));
         Vector3D normal = Vector3D.normalize(Vector3D.substract(position, getPosition()));
         return new Intersection(position, distance, normal, this);
+    }
+
+    @Override
+    public BoundingBox getBoundingBox() {
+        Vector3D min = new Vector3D(
+                getPosition().getX() - radius,
+                getPosition().getY() - radius,
+                getPosition().getZ() - radius
+        );
+        Vector3D max = new Vector3D(
+                getPosition().getX() + radius,
+                getPosition().getY() + radius,
+                getPosition().getZ() + radius
+        );
+        return new BoundingBox(min, max);
     }
 
 }

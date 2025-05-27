@@ -1,5 +1,7 @@
 package TheRayTracer.lights;
 
+import TheRayTracer.BVH.BVHNode;
+import TheRayTracer.BVH.BoundingBox;
 import TheRayTracer.Intersection;
 import TheRayTracer.Ray;
 import TheRayTracer.Vector3D;
@@ -36,7 +38,12 @@ public class DirectionalLight extends Light{
     }
 
     @Override
-    public boolean isInShadow(Vector3D point, Vector3D normal, List<Object3D> objects) {
+    public boolean isInShadow(Vector3D point, Vector3D normal, Object3D bvhRoot) {
         return false;
+    }
+
+    @Override
+    public BoundingBox getBoundingBox() {
+        return null;
     }
 }

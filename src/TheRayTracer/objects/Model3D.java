@@ -1,5 +1,6 @@
 package TheRayTracer.objects;
 
+import TheRayTracer.BVH.BoundingBox;
 import TheRayTracer.Intersection;
 import TheRayTracer.Ray;
 import TheRayTracer.Vector3D;
@@ -62,4 +63,16 @@ public class Model3D extends Object3D{
 
         return new Intersection(position, distance, normal, this);
     }
+
+    @Override
+    public BoundingBox getBoundingBox() {
+        Triangle[] trianglesArray = triangles.toArray(new Triangle[0]);
+        if (trianglesArray.length == 0) return null;
+        BoundingBox boundingBox = trianglesArray[0].getBoundingBox();
+        for (int i = 1; i < trianglesArray.length; i++) {
+            boundingBox = BoundingBox.combine(boundingBox, trianglesArray[i].getBoundingBox());
+        }
+        return boundingBox;
+    }
+
 }

@@ -80,4 +80,13 @@ public class Vector3D {
     public static Vector3D scalarMultiplication(Vector3D vectorA, double scalar){
         return new Vector3D(vectorA.getX() * scalar, vectorA.getY() * scalar, vectorA.getZ() * scalar);
     }
+
+    public double get(int axis) {
+        switch(axis) {
+            case 0: return this.x;
+            case 1: return this.y;
+            case 2: return this.z;
+            default: throw new IllegalArgumentException("Invalid axis: " + axis);
+        }
+    }
 }

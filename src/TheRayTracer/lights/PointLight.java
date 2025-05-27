@@ -1,5 +1,6 @@
 package TheRayTracer.lights;
 
+import TheRayTracer.BVH.BoundingBox;
 import TheRayTracer.Intersection;
 import TheRayTracer.Ray;
 import TheRayTracer.Vector3D;
@@ -17,21 +18,18 @@ public class PointLight extends Light{
     }
 
     @Override
-    public boolean isInShadow(Vector3D point, Vector3D normal, List<Object3D> objects) {
-        Vector3D toLight = Vector3D.substract(getPosition(),point);
+    public boolean isInShadow(Vector3D point, Vector3D normal, Object3D bvhRoot){
+        Vector3D toLight = Vector3D.substract(getPosition(), point);
         double distanceToLight = Vector3D.magnitude(toLight);
         Vector3D direction = Vector3D.normalize(toLight);
-        Vector3D origin = Vector3D.add(point,Vector3D.scalarMultiplication( normal,.0001));
-        Ray shadowRay = new Ray(origin, direction);
+        Vector3D origin = Vector3D.add(point, Vector3D.scalarMultiplication(normal, 0.0001));
 
-        for (Object3D obj : objects) {
-            Intersection shadowHit = obj.getIntersection(shadowRay);
-            if (shadowHit != null && shadowHit.getDistance() < distanceToLight) {
-                return true;
-            }
-        }
-        return false;
+        Ray shadowRay = new Ray(origin, direction);
+        Intersection hit = bvhRoot.getIntersection(shadowRay);
+
+        return hit != null && hit.getDistance() < distanceToLight;
     }
+
 
     @Override
     public double getNDotL(Intersection intersection) {
@@ -40,6 +38,11 @@ public class PointLight extends Light{
 
     @Override
     public Intersection getIntersection(Ray ray) {
+        return null;
+    }
+
+    @Override
+    public BoundingBox getBoundingBox() {
         return null;
     }
 }

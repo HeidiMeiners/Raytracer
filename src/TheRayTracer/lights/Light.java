@@ -1,5 +1,6 @@
 package TheRayTracer.lights;
 
+import TheRayTracer.BVH.BVHNode;
 import TheRayTracer.objects.Object3D;
 import TheRayTracer.Vector3D;
 import TheRayTracer.Intersection;
@@ -15,7 +16,8 @@ public abstract class Light extends Object3D {
         setIntensity(intensity);
     }
 
-    public abstract boolean isInShadow(Vector3D point, Vector3D normal, List<Object3D> objects);
+    public abstract boolean isInShadow(Vector3D point, Vector3D normal, Object3D bvhRoot);
+
 
     public double getIntensity() {
         return intensity;

@@ -1,5 +1,6 @@
 package TheRayTracer;
 
+import TheRayTracer.BVH.BVHNode;
 import TheRayTracer.lights.Light;
 import TheRayTracer.objects.Object3D;
 import TheRayTracer.objects.Camera;
@@ -11,6 +12,7 @@ public class Scene {
     private Camera camera;
     private List<Object3D> objects;
     private List<Light> lights;
+    private BVHNode bvhRoot = null;
 
     public Scene() {
         setObjects(new ArrayList<>());
@@ -53,5 +55,13 @@ public class Scene {
 
     public void addLight(Light light){
         getLights().add(light);
+    }
+
+    public void buildBVH() {
+        this.bvhRoot = new BVHNode(objects);
+    }
+
+    public BVHNode getBVHRoot() {
+        return bvhRoot;
     }
 }

@@ -1,5 +1,6 @@
 package TheRayTracer.objects;
 
+import TheRayTracer.BVH.BoundingBox;
 import TheRayTracer.Intersection;
 import TheRayTracer.Ray;
 import TheRayTracer.Vector3D;
@@ -106,5 +107,18 @@ public class Triangle implements IIntersectable {
         double lambda1 = 1.0 - lambda2 - lambda3;
 
         return new Vector3D(lambda1, lambda2, lambda3);
+    }
+
+    public BoundingBox getBoundingBox() {
+        Vector3D[] vertices = getVertices();
+        double minX = Math.min(vertices[0].getX(), Math.min(vertices[1].getX(), vertices[2].getX()));
+        double minY = Math.min(vertices[0].getY(), Math.min(vertices[1].getY(), vertices[2].getY()));
+        double minZ = Math.min(vertices[0].getZ(), Math.min(vertices[1].getZ(), vertices[2].getZ()));
+
+        double maxX = Math.max(vertices[0].getX(), Math.max(vertices[1].getX(), vertices[2].getX()));
+        double maxY = Math.max(vertices[0].getY(), Math.max(vertices[1].getY(), vertices[2].getY()));
+        double maxZ = Math.max(vertices[0].getZ(), Math.max(vertices[1].getZ(), vertices[2].getZ()));
+
+        return new BoundingBox(new Vector3D(minX, minY, minZ), new Vector3D(maxX, maxY, maxZ));
     }
 }
